@@ -1,15 +1,17 @@
 import os
 import time
-from selenium import webdriver
 import cv2
 import numpy as np
-import pytesseract
+from selenium import webdriver
+from pytesseract import image_to_string
 from scipy import stats
+
 
 def touch_dir(path):
     if not os.path.isdir(path):
         os.mkdir(path)   
     return
+
 
 def get_imgs(): 
     url = 'https://oauth.ccxp.nthu.edu.tw/v1.1/authorize.php?response_type=code&client_id=eeclass&redirect_uri=https%3A%2F%2Feeclass.nthu.edu.tw%2Fservice%2Foauth%2F&scope=lmsid+userid&state='
@@ -30,23 +32,24 @@ def binarize(img_list):
     out = []
     for img in img_list:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        (th, img) = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        (th, img) = cv2.threshold(img, 128, 255, 
+                cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         out.append(img)
     return out
 
 
-def dilate(img_list, kernel):
+def dilate(img_list, kernel, iterations=1):
     out = []
     for img in img_list:
-        out.append(cv2.dilate(img, kernel, iterations= 1))
+        out.append(cv2.dilate(img, kernel, iterations=iterations))
     return out
 
 
 def ocr_by_mode(img_list):
     results = np.empty((0, 4), int)
-    my_config = '--psm 7 -c tessedit_char_whitelist=0123456789'
+    config = '--psm 7 -c tessedit_char_whitelist=0123456789'
     for img in img_list:
-        result = pytesseract.image_to_string(img, lang='digits', config=my_config).strip()
+        result = image_to_string(img, lang='digits', config=config).strip()
         print(result)
         if len(result) == 4:
             results = np.append(results,
@@ -70,7 +73,6 @@ if __name__ == '__main__':
     imgs_2 = dilate(imgs_1, np.ones((1,3), np.uint8))
     touch_dir('temp')
     save_imgs_in_temp(imgs_2)
-    print('----------')
     print(ocr_by_mode(imgs_2))
 
 
