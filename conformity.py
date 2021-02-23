@@ -51,8 +51,8 @@ def ocr(read_dir):
 
 
 if __name__ == '__main__':
-    get_imgs('temp/')
-    denoise('temp/', 'temp/')
-    print(ocr('temp/'))
+    get_imgs('raw/')
+    denoise('raw/', 'denoised/')
+    print(ocr('denoised/'))
 
 
