@@ -15,7 +15,7 @@ def get_imgs():
     url = 'https://oauth.ccxp.nthu.edu.tw/v1.1/authorize.php?response_type=code&client_id=eeclass&redirect_uri=https%3A%2F%2Feeclass.nthu.edu.tw%2Fservice%2Foauth%2F&scope=lmsid+userid&state='
     driver = webdriver.Safari()
     driver.get(url)
-    time.sleep(2)
+    time.sleep(1)
     img_node = driver.find_element_by_id('captcha_image')
     img_src = img_node.get_attribute('src')
     for index in range(0, 10):
@@ -35,7 +35,7 @@ def binarize(img_list):
     return out
 
 
-def denoise(img_list, kernel):
+def dilate(img_list, kernel):
     out = []
     for img in img_list:
         out.append(cv2.dilate(img, kernel, iterations= 1))
@@ -66,8 +66,8 @@ if __name__ == '__main__':
     get_imgs()
     raw_imgs = [ cv2.imread(f'test/{filename}') for filename in sorted(os.listdir('test')) ]
     bw_imgs = binarize(raw_imgs)
-    imgs_1 = denoise(bw_imgs, np.ones((4,1), np.uint8))
-    imgs_2 = denoise(imgs_1, np.ones((1,3), np.uint8))
+    imgs_1 = dilate(bw_imgs, np.ones((4,1), np.uint8))
+    imgs_2 = dilate(imgs_1, np.ones((1,3), np.uint8))
     touch_dir('temp')
     save_imgs_in_temp(imgs_2)
     print('----------')
