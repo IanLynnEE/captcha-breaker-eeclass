@@ -39,7 +39,7 @@ def denoise(read_dir, save_dir):
 def ocr(read_dir):
     results = np.empty((0, 4), int)
     my_config = '--psm 7 -c tessedit_char_whitelist=0123456789'
-    for filename in sorted(os.listdir('temp')):
+    for filename in sorted(os.listdir(read_dir)):
         img = cv2.imread(read_dir + filename)
         result = pytesseract.image_to_string(img, lang='digits', config=my_config).strip()
         print(filename, result)
